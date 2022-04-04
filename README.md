@@ -1,4 +1,4 @@
-# code-annotations
+# tf-annotations
 
 This project was created as a way of creating a central "annotation" file of all the useful
 notes that might be created in a code base such as `TODO` comments.
