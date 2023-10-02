@@ -1,21 +1,25 @@
 from __future__ import annotations
 
-import argparse
+import click
 import hashlib
 import io
+import os
+import pathlib
 from typing import Sequence, TextIO
 import toml
 
 
 def find_annonations(
-    files: Sequence[str], comment_sytnax: Sequence[str], annotation: str
+    files: Sequence[str],
+    comment_sytnax: Sequence[str],
+    annotation: str,
+    table_headers: str,
 ) -> io.StringIO:
-
     title = annotation.strip("#:")
     tmp_output = io.StringIO()
 
-    tmp_output.write("## " + title + " List\n")
-    tmp_output.write("|File:Line|Date|Comment|\n")
+    tmp_output.write("## " + title + "\n")
+    tmp_output.write("|" + table_headers + "|\n")
     tmp_output.write("|---|---|---|\n")
 
     for filename in files:
@@ -25,7 +29,6 @@ def find_annonations(
                     for line_number, line in enumerate(f, 1):
                         if line.startswith(syntax + annotation):
                             message = line.split(":")
-                            print(message)
                             tmp_output.write(
                                 "| "
                                 + filename
@@ -38,7 +41,6 @@ def find_annonations(
                                 + "|"
                                 + "\n"
                             )
-                tmp_output.write("\n\n")
         except Exception as e:
             print(e)
 
@@ -63,30 +65,30 @@ def load_config(file_name: str) -> dict:
         print(e)
 
 
-def filter_files(file_suffix: str, filenames: str) -> Sequence[str]:
-
+def filter_files(file_suffix: Sequence[str], filenames: Sequence[str]) -> Sequence[str]:
     to_process = []
 
     for suffix in file_suffix:
         for file in filenames:
             if file.endswith(suffix):
-                to_process.extend(file)
+                to_process.append(file)
 
     return to_process
 
 
-def cli(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser("Create TODO.md from TODO comments in Terraform")
-    parser.add_argument("filenames", nargs="*", help="Filenames to check")
-    parser.add_argument(
-        "--config",
-        help="Config file name",
-        dest="config_file",
-        default=".tf-annotations.toml",
-    )
-    args = parser.parse_args(argv)
+@click.command()
+@click.option("--config", default=".code-annotations.toml", help="Config file name")
+def cli(config) -> int:
+    filenames = set()
+    cwd = pathlib.Path(".")
 
-    toml_config = load_config(args.config_file)
+    for dir_, _, files in os.walk(cwd):
+        for file_name in files:
+            rel_dir = os.path.relpath(dir_, cwd)
+            rel_file = os.path.join(rel_dir, file_name)
+            filenames.add(rel_file)
+
+    toml_config = load_config(config)
 
     try:
         output_file = open(toml_config["output_file"], "w+")
@@ -95,13 +97,16 @@ def cli(argv: Sequence[str] | None = None) -> int:
         return 1
 
     to_process = []
-    to_process = filter_files(toml_config["file_suffix"], args.filenames)
+    to_process = filter_files(toml_config["file_suffix"], filenames)
     new_report = io.StringIO()
 
     for header in toml_config["headers"]:
         new_report.write(
             find_annonations(
-                to_process, toml_config["comment_syntax"], header + ":"
+                to_process,
+                toml_config["comment_syntax"],
+                header["comment"] + ":",
+                header["table_headers"],
             ).getvalue()
         )
 

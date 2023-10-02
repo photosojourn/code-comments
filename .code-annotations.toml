@@ -1,0 +1,10 @@
+file_suffix=[".tf"]
+output_file="ANNOTATIONS.md"
+comment_syntax = ["#"]
+
+[[headers]]
+comment = "tfsec"
+table_headers = "File:Line|Type|Comment"
+[[headers]]
+comment = "todo"
+table_headers = "File:Line|Date|Comment"

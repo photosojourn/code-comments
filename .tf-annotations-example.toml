@@ -1,6 +1,0 @@
-title = "TF Annotation Config file"
-
-file_suffix=["*.tf"]
-headers=["TODO","KNOWISSUES"]
-output_file="ANNOTATIONS.md"
-comment_syntax = ["#", "//"]

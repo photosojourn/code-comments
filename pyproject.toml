@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "tf-annotations"
+name = "code-comments"
 version = "0.3.1"
-description = "Tool to report on annotations such as TODO"
+description = "Tool to report on comments such as TODO"
 authors = ["Russell Whelan <russell.whelan+python@gmail.com>"]
 license = "MIT"
 readme = "README.md"
@@ -9,6 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 toml = "^0.10.2"
+click = "^8.1.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -18,4 +19,4 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-tf-annotations = "tf_annotations.cmd:cli"
+code-comments = "code_comments.cmd:cli"
