@@ -1,19 +1,23 @@
-# tf-annotations
-
+# code-comments
 This project was created as a way of creating a central "annotation" file of all the useful
-notes that might be created in a code base such as `TODO` comments.
+notes that might be created in a code base such as `todo` or 'tfsec' comments.
 
 ## Configuration
 
-The project can be configured via a TOML file which by default is called `.tf-annotations.toml` but can be override with the `--config` flag.
+The project can be configured via a TOML file which by default is called `.code-annotations.toml` but can be override with the `--config` flag.
 
-Below is an example which can be found at `.tf-annotations-example.toml`
+Below is an example which can be found at `.code-annotations.toml`
 
 ```TOML
-title = "Code Annotation Config file"
-
-file_suffix=["*.tf"]
-headers=["TODO","KNOWISSUES"]
+file_suffix=[".tf"]
 output_file="ANNOTATIONS.md"
-comment_syntax = ["#", "//"]
+comment_syntax = ["#"]
+
+[[headers]]
+comment = "tfsec"
+table_headers = "File:Line|Type|Comment"
+[[headers]]
+comment = "todo"
+table_headers = "File:Line|Date|Comment"
+
 ```
