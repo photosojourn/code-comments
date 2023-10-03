@@ -7,6 +7,7 @@ import os
 import pathlib
 from typing import Sequence, TextIO
 import toml
+import sys
 
 
 def find_annonations(
@@ -88,13 +89,17 @@ def cli(config) -> int:
             rel_file = os.path.join(rel_dir, file_name)
             filenames.add(rel_file)
 
+    filenames = sorted(filenames)
+
     toml_config = load_config(config)
 
     try:
+        output_file = open(toml_config["output_file"], "r")
+    except FileNotFoundError:
         output_file = open(toml_config["output_file"], "w+")
     except Exception as e:
         print(e)
-        return 1
+        sys.exit(1)
 
     to_process = []
     to_process = filter_files(toml_config["file_suffix"], filenames)
@@ -111,8 +116,12 @@ def cli(config) -> int:
         )
 
     if not compare_files(output_file, new_report):
-        output_file.write(new_report.getvalue())
-
-    output_file.close()
-
-    return 0
+        print("Files don't match")
+        output_file.close()  # Close file handle
+        new_file = open(toml_config["output_file"], "w")  # reopen with write
+        new_file.write(new_report.getvalue())
+        new_file.close()
+        sys.exit(1)
+    else:
+        print("Files match")
+        sys.exit(0)
