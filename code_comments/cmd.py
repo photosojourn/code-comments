@@ -1,6 +1,6 @@
 from __future__ import annotations
-
-import click
+from typing import Optional
+import typer
 import hashlib
 import io
 import os
@@ -9,6 +9,9 @@ from typing import Sequence, TextIO
 import toml
 import sys
 
+app = typer.Typer(
+    help="Friendly Code Vending Machine",
+)
 
 def find_annonations(
     files: Sequence[str],
@@ -77,11 +80,11 @@ def filter_files(file_suffix: Sequence[str], filenames: Sequence[str]) -> Sequen
     return to_process
 
 
-@click.command()
-@click.option("--config", default=".code-annotations.toml", help="Config file name")
-def cli(config) -> int:
+@app.command()
+def cli(config: Optional[str] =".code-annotations.toml") -> int:
     filenames = set()
     cwd = pathlib.Path(".")
+    toml_config = load_config(config)
 
     for dir_, _, files in os.walk(cwd):
         for file_name in files:
@@ -90,8 +93,6 @@ def cli(config) -> int:
             filenames.add(rel_file)
 
     filenames = sorted(filenames)
-
-    toml_config = load_config(config)
 
     try:
         output_file = open(toml_config["output_file"], "r")
@@ -125,3 +126,9 @@ def cli(config) -> int:
     else:
         print("Files match")
         sys.exit(0)
+
+def main():
+    app()
+
+if __name__ == "__main__":
+    main()
