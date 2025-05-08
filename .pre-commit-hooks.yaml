@@ -1,5 +1,6 @@
 - id: code-comments
   name: "Code Comments: Comment aggrgation tool"
-  language: python
+  language: system
   entry: code-comments
   pass_filenames: false
+  types: [text]
